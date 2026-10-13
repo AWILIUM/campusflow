@@ -1,0 +1,35 @@
+name: CampusFlow CI/CD
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Build (syntax check)
+        run: python -m compileall app
+
+      - name: Unit tests
+        run: pytest tests/unit -v
+
+      - name: Integration tests (roles & access)
+        run: pytest tests/integration -v
+
+      - name: Smoke tests
+        run: pytest tests/smoke -v
